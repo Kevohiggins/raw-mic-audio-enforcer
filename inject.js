@@ -232,7 +232,8 @@
                         });
                     });
                 }
-                console.log(LOG, 'applyConstraints interceptado — filtros bloqueados.');
+                c.channelCount = 2;
+                console.log(LOG, 'applyConstraints interceptado — filtros bloqueados y estéreo mantenido.');
             }
             return _ac.apply(this, arguments);
         };
