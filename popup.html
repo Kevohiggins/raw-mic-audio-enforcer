@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Raw Mic Audio Enforcer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <span class="brand-title">Raw Mic Enforcer</span>
+        </div>
+        <span class="version">v2.2</span>
+    </header>
+
+    <!-- Switch Maestro -->
+    <div class="master-card" id="masterCard">
+        <div class="master-info">
+            <h3>Modo Audio Crudo</h3>
+            <div class="status-badge" id="statusBadge">
+                <span class="dot"></span>
+                <span id="statusText">Desactivado</span>
+            </div>
+        </div>
+        <label class="switch">
+            <input type="checkbox" id="masterToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <!-- Toggle por Sitio Actual -->
+    <div class="site-card" id="siteCard">
+        <div class="site-info">
+            <div class="site-label">Sitio Actual</div>
+            <div class="site-domain" id="siteDomain">cargando...</div>
+        </div>
+        <button class="btn-site-toggle" id="btnSiteToggle">Excluir Sitio</button>
+    </div>
+
+    <!-- Modo Experto (Protocolos Individuales) -->
+    <div class="accordion" id="expertAccordion">
+        <div class="accordion-header" id="accordionHeader">
+            <span>Modo Experto (Protocolos)</span>
+            <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Filtros de Micro</div>
+                    <div class="protocol-desc">Elimina supresión, eco y ganancia</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoKillFilters">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">SDP Opus 320 kbps</div>
+                    <div class="protocol-desc">Forzar estéreo CBR de alta calidad</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoSdpMunge">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Anular Compresores</div>
+                    <div class="protocol-desc">DynamicsCompressor a ratio 1:1</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoCompressorKill">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">MediaRecorder 320k</div>
+                    <div class="protocol-desc">Grabación en bitrate máximo</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoMediaRecorder">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <button class="btn-link" id="btnOpenOptions">Abrir Opciones Avanzadas</button>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

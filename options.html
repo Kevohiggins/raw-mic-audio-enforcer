@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Opciones - Raw Mic Audio Enforcer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="options-body">
+    <header>
+        <div class="brand">
+            <span class="brand-title">Raw Mic Audio Enforcer — Opciones</span>
+        </div>
+        <span class="version">v2.2</span>
+    </header>
+
+    <!-- Estado Global -->
+    <div class="options-card">
+        <h2 class="options-title">Configuración General</h2>
+        <div class="master-card" id="masterCard">
+            <div class="master-info">
+                <h3>Modo Audio Crudo (Global)</h3>
+                <div class="status-badge" id="statusBadge">
+                    <span class="dot"></span>
+                    <span id="statusText">Desactivado</span>
+                </div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="masterToggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Lista Negra de Dominios -->
+    <div class="options-card">
+        <h2 class="options-title">Sitios Excluidos (Lista Negra)</h2>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            Las páginas agregadas a esta lista ignorarán el audio crudo y usarán el procesamiento nativo de la web (ej: Meet, Discord).
+        </p>
+        
+        <div class="domain-input-group">
+            <input type="text" id="inputDomain" class="input-domain" placeholder="ejemplo: meet.google.com">
+            <button class="btn-add" id="btnAddDomain">Agregar Sitio</button>
+        </div>
+
+        <ul class="domain-list" id="domainList">
+            <!-- Dominios agregados dinámicamente -->
+        </ul>
+    </div>
+
+    <!-- Protocolos e Interceptores -->
+    <div class="options-card">
+        <h2 class="options-title">Módulos de Intercepción (Modo Experto)</h2>
+        <div class="protocol-item">
+            <div>
+                <div class="protocol-label">Filtros de Micrófono (killFilters)</div>
+                <div class="protocol-desc">Desactiva echoCancellation, noiseSuppression y autoGainControl</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="protoKillFilters">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="protocol-item">
+            <div>
+                <div class="protocol-label">SDP Munging (sdpMunge)</div>
+                <div class="protocol-desc">Fuerza Opus a 320 kbps estéreo CBR en RTCPeerConnection</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="protoSdpMunge">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="protocol-item">
+            <div>
+                <div class="protocol-label">Anular Compresores (compressorKill)</div>
+                <div class="protocol-desc">Neutraliza el DynamicsCompressor de Web Audio (Ratio 1:1)</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="protoCompressorKill">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="protocol-item">
+            <div>
+                <div class="protocol-label">Bitrate de Grabación (mediaRecorder)</div>
+                <div class="protocol-desc">Asegura un alto bitrate al usar MediaRecorder</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="protoMediaRecorder">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="protocol-item" style="border-top: 1px solid var(--border); padding-top: 15px; margin-top: 5px;">
+            <div>
+                <div class="protocol-label">Calidad de Audio (Global)</div>
+                <div class="protocol-desc">Define el Bitrate máximo para todas las intercepciones.</div>
+            </div>
+            <select id="bitrateSelect" style="background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 5px 10px; border-radius: 4px; font-family: inherit; font-size: 13px; cursor: pointer;">
+                <option value="64000">64 kbps (Baja - Voz estándar)</option>
+                <option value="128000">128 kbps (Normal - Excelente voz)</option>
+                <option value="192000">192 kbps (Alta - Podcasts)</option>
+                <option value="320000" selected>320 kbps (Estudio - Música/Reaper)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Autor y Soporte -->
+    <div class="options-card" style="margin-top: 30px; border-top: 2px solid var(--border); padding-top: 20px;">
+        <h2 class="options-title" style="margin-bottom: 10px;">Acerca del Autor</h2>
+        <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 15px;">
+            Extensión dirigida y diseñada por <strong>Kevin O'Higgins</strong>, e impulsada por el código de <strong>Gemini</strong>.<br><br>
+            Si esto te pareció útil, y querés regalarme una birra, abajo tenés los botones para hacerlo. También podés contactarme, aunque si me donás posiblemente te dé más bola.
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="https://kevohiggins.github.io/contactame" target="_blank" rel="noopener noreferrer" style="background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; cursor: pointer; transition: 0.2s;">Contacto / Feedback</a>
+            <a href="https://link.mercadopago.com.ar/kevohiggins" target="_blank" rel="noopener noreferrer" style="background: var(--primary); border: 1px solid var(--primary); color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; cursor: pointer; transition: 0.2s; font-weight: bold;">Donar (MercadoPago)</a>
+            <a href="https://www.paypal.me/KevOHiggins" target="_blank" rel="noopener noreferrer" style="background: var(--primary); border: 1px solid var(--primary); color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; cursor: pointer; transition: 0.2s; font-weight: bold;">Donar (PayPal)</a>
+        </div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+</html>

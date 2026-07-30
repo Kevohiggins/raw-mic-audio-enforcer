@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Raw Mic Audio Enforcer",
+  "version": "2.2.1",
+  "description": "Fuerza a las páginas web a usar el audio del micrófono puro. Intercepta la cadena de audio WebRTC con control ON/OFF, lista negra por sitio y configuración avanzada.",
+  "permissions": ["storage", "activeTab"],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Raw Mic Audio Enforcer"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["inject.js"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "world": "MAIN"
+    }
+  ]
+}
