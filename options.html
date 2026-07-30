@@ -50,7 +50,7 @@
 
     <!-- Protocolos e Interceptores -->
     <div class="options-card">
-        <h2 class="options-title">Módulos de Intercepción (Modo Experto)</h2>
+        <h2 class="options-title">Personalización de Protocolos</h2>
         <div class="protocol-item">
             <div>
                 <div class="protocol-label">Filtros de Micrófono (killFilters)</div>
@@ -64,7 +64,7 @@
         <div class="protocol-item">
             <div>
                 <div class="protocol-label">SDP Munging (sdpMunge)</div>
-                <div class="protocol-desc">Fuerza Opus a 320 kbps estéreo CBR en RTCPeerConnection</div>
+                <div class="protocol-desc">Fuerza el códec Opus en estéreo CBR con la calidad seleccionada en RTCPeerConnection</div>
             </div>
             <label class="switch">
                 <input type="checkbox" id="protoSdpMunge">
@@ -84,7 +84,7 @@
         <div class="protocol-item">
             <div>
                 <div class="protocol-label">Bitrate de Grabación (mediaRecorder)</div>
-                <div class="protocol-desc">Asegura un alto bitrate al usar MediaRecorder</div>
+                <div class="protocol-desc">Aplica la calidad seleccionada a las grabaciones hechas con MediaRecorder</div>
             </div>
             <label class="switch">
                 <input type="checkbox" id="protoMediaRecorder">
