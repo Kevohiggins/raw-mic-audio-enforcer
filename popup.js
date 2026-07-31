@@ -15,6 +15,7 @@ const DEFAULT_CONFIG = {
 };
 
 let currentHostname = '';
+let currentUrl = '';
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Obtener la pestaña activa
@@ -23,8 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const url = new URL(tabs[0].url);
                 currentHostname = url.hostname;
+                currentUrl = tabs[0].url;
             } catch(e) {
                 currentHostname = '';
+                currentUrl = '';
             }
         }
         updateSiteUI();
@@ -122,7 +125,9 @@ function updateSiteUI(blacklistArray) {
     const domainEl = document.getElementById('siteDomain');
     const btn = document.getElementById('btnSiteToggle');
     
-    if (!currentHostname || currentHostname.startsWith('chrome') || currentHostname.startsWith('brave')) {
+    // Página del sistema: cualquier protocolo que no sea http o https
+    // (cubre chrome://, brave://, edge://, vivaldi://, opera://, file://, about:, etc.)
+    if (!currentHostname || !currentUrl.startsWith('http')) {
         domainEl.textContent = 'Página del sistema';
         btn.style.display = 'none';
         return;
