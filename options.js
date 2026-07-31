@@ -6,7 +6,11 @@ const DEFAULT_CONFIG = {
         killFilters: true,
         sdpMunge: true,
         compressorKill: true,
-        mediaRecorder: true
+        mediaRecorder: true,
+        audioWorklet: true,
+        displayMedia: true,
+        encodedTransform: true,
+        workletFetch: false
     }
 };
 
@@ -28,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Switchees de Protocolos
-    const protoKeys = ['killFilters', 'sdpMunge', 'compressorKill', 'mediaRecorder'];
+    const protoKeys = ['killFilters', 'sdpMunge', 'compressorKill', 'mediaRecorder', 'audioWorklet', 'displayMedia', 'encodedTransform', 'workletFetch'];
     protoKeys.forEach(key => {
         const id = 'proto' + key.charAt(0).toUpperCase() + key.slice(1);
         const input = document.getElementById(id);
@@ -69,6 +73,10 @@ function loadOptions() {
         document.getElementById('protoSdpMunge').checked = !!protocols.sdpMunge;
         document.getElementById('protoCompressorKill').checked = !!protocols.compressorKill;
         document.getElementById('protoMediaRecorder').checked = !!protocols.mediaRecorder;
+        document.getElementById('protoAudioWorklet').checked = protocols.audioWorklet !== false;
+        document.getElementById('protoDisplayMedia').checked = protocols.displayMedia !== false;
+        document.getElementById('protoEncodedTransform').checked = protocols.encodedTransform !== false;
+        document.getElementById('protoWorkletFetch').checked = !!protocols.workletFetch;
     });
 }
 
@@ -152,7 +160,11 @@ function saveProtocols() {
         killFilters: document.getElementById('protoKillFilters').checked,
         sdpMunge: document.getElementById('protoSdpMunge').checked,
         compressorKill: document.getElementById('protoCompressorKill').checked,
-        mediaRecorder: document.getElementById('protoMediaRecorder').checked
+        mediaRecorder: document.getElementById('protoMediaRecorder').checked,
+        audioWorklet: document.getElementById('protoAudioWorklet').checked,
+        displayMedia: document.getElementById('protoDisplayMedia').checked,
+        encodedTransform: document.getElementById('protoEncodedTransform').checked,
+        workletFetch: document.getElementById('protoWorkletFetch').checked
     };
     chrome.storage.local.set({ protocols: protocols });
 }

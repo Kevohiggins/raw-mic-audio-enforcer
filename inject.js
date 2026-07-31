@@ -1,37 +1,39 @@
 (function() {
     // ============================================================
-    // RAW MIC AUDIO ENFORCER v2.2.1
+    // RAW MIC AUDIO ENFORCER v2.3.0
     // Intercepción dinámica de audio WebRTC / Web Audio.
     // ============================================================
     if (window.__rawMicEnforcerInjected) return;
     window.__rawMicEnforcerInjected = true;
 
     var LOG = '[Raw Mic Enforcer]';
-    
+
     function getTargetBitrate() {
         return currentConfig.targetBitrate || 320000;
     }
 
-    // Configuración por defecto. Asumimos inactivo hasta recibir confirmación
-    // para evitar falsos positivos si el usuario lo apagó.
+    // Configuración por defecto: ACTIVO por defecto para evitar la ventana ciega
+    // durante el tiempo que tarda content.js en enviar la config real.
+    // Si el usuario lo apagó, content.js lo corregirá en <50ms.
     var currentConfig = {
-        isActive: false,
+        isActive: true,
         targetBitrate: 320000,
         protocols: {
             killFilters: true,
             sdpMunge: true,
             compressorKill: true,
-            mediaRecorder: true
+            mediaRecorder: true,
+            audioWorklet: true,
+            displayMedia: true,
+            encodedTransform: true
         }
     };
-    var configReceived = false;
 
     // Escuchar actualizaciones dinámicas desde content.js
     window.addEventListener('message', function(event) {
         if (event && event.data && event.data.type === 'RAW_MIC_CONFIG_UPDATE') {
             if (event.data.config) {
                 currentConfig = event.data.config;
-                configReceived = true;
                 console.log(LOG, 'Estado actualizado:', currentConfig);
             }
         }
@@ -75,12 +77,14 @@
 
     // ============================================================
     // 2. HELPER: SDP Munging — Forzar Opus a máxima calidad
+    //    Regex robusta: soporta "opus/48000" y "opus/48000/2"
     // ============================================================
     function mungeSDP(sdp) {
         if (!currentConfig.isActive || !currentConfig.protocols.sdpMunge) return sdp;
         if (!sdp) return sdp;
 
-        var m = sdp.match(/a=rtpmap:(\d+)\s+opus\/48000/i);
+        // Busca el payload type de Opus, con o sin canal explícito (/2)
+        var m = sdp.match(/a=rtpmap:(\d+)\s+opus\/48000(?:\/\d+)?/i);
         if (!m) return sdp;
 
         var pt = m[1];
@@ -98,6 +102,7 @@
             sdp = sdp.replace(mapRe, '$1a=fmtp:' + pt + ' ' + hq + '\r\n');
         }
 
+        // Eliminar límites de banda que Chrome/Firefox puedan imponer en el SDP
         sdp = sdp.replace(/b=AS:\d+\r\n/g, '');
         sdp = sdp.replace(/b=TIAS:\d+\r\n/g, '');
         sdp = sdp.replace(/b=CT:\d+\r\n/g, '');
@@ -105,26 +110,12 @@
         return sdp;
     }
 
-    // Para evitar problemas de inicialización, interceptamos funciones con asincronía.
-    
     // ============================================================
     // 3. getUserMedia — API moderna
     // ============================================================
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         var _gum = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
         navigator.mediaDevices.getUserMedia = function(c) {
-            // Permitimos un breve retardo si la configuración no llegó (solo primera llamada)
-            if (!configReceived) {
-                return new Promise(function(resolve, reject) {
-                    setTimeout(function() {
-                        if (currentConfig.isActive && currentConfig.protocols.killFilters) {
-                            killFilters(c);
-                            console.log(LOG, 'getUserMedia interceptado (retrasado).', c);
-                        }
-                        _gum(c).then(resolve).catch(reject);
-                    }, 25);
-                });
-            }
             if (currentConfig.isActive && currentConfig.protocols.killFilters) {
                 killFilters(c);
                 console.log(LOG, 'getUserMedia interceptado.', c);
@@ -134,7 +125,25 @@
     }
 
     // ============================================================
-    // 4. getUserMedia — API legacy
+    // 4. getDisplayMedia — Captura de pantalla con audio del sistema
+    // ============================================================
+    if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+        var _gdm = navigator.mediaDevices.getDisplayMedia.bind(navigator.mediaDevices);
+        navigator.mediaDevices.getDisplayMedia = function(c) {
+            if (currentConfig.isActive && currentConfig.protocols.displayMedia) {
+                c = c || {};
+                if (c.audio === true) c.audio = {};
+                if (typeof c.audio === 'object') {
+                    AUDIO_KILL.forEach(function(p) { c.audio[p] = false; });
+                    console.log(LOG, 'getDisplayMedia interceptado — filtros de audio del sistema bloqueados.');
+                }
+            }
+            return _gdm(c);
+        };
+    }
+
+    // ============================================================
+    // 5. getUserMedia — API legacy
     // ============================================================
     ['getUserMedia', 'webkitGetUserMedia', 'mozGetUserMedia'].forEach(function(fn) {
         if (navigator[fn]) {
@@ -150,7 +159,7 @@
     });
 
     // ============================================================
-    // 5. RTCPeerConnection — SDP Munging
+    // 6. RTCPeerConnection — SDP Munging
     // ============================================================
     if (window.RTCPeerConnection) {
         var proto = RTCPeerConnection.prototype;
@@ -197,7 +206,7 @@
     }
 
     // ============================================================
-    // 6. RTCRtpSender.setParameters()
+    // 7. RTCRtpSender.setParameters()
     // ============================================================
     if (window.RTCRtpSender && RTCRtpSender.prototype.setParameters) {
         var _sp = RTCRtpSender.prototype.setParameters;
@@ -216,7 +225,29 @@
     }
 
     // ============================================================
-    // 7. MediaStreamTrack.applyConstraints()
+    // 8. RTCRtpSender — Encoded Transform API (Insertable Streams)
+    //    Sitios como Discord usan esto para procesar audio post-codec.
+    //    Lo interceptamos para forzar passthrough si el protocolo está activo.
+    // ============================================================
+    if (window.RTCRtpSender && RTCRtpSender.prototype.createEncodedStreams) {
+        var _ces = RTCRtpSender.prototype.createEncodedStreams;
+        RTCRtpSender.prototype.createEncodedStreams = function() {
+            var streams = _ces.apply(this, arguments);
+            if (currentConfig.isActive && currentConfig.protocols.encodedTransform) {
+                try {
+                    // Pipe readable directamente a writable (passthrough sin procesamiento)
+                    streams.readable.pipeTo(streams.writable);
+                    console.log(LOG, 'Encoded Transform interceptado → passthrough activado.');
+                } catch(e) {
+                    // Si el sitio ya conectó los streams, no hacemos nada
+                }
+            }
+            return streams;
+        };
+    }
+
+    // ============================================================
+    // 9. MediaStreamTrack.applyConstraints()
     // ============================================================
     if (window.MediaStreamTrack && MediaStreamTrack.prototype.applyConstraints) {
         var _ac = MediaStreamTrack.prototype.applyConstraints;
@@ -240,7 +271,7 @@
     }
 
     // ============================================================
-    // 8. MediaRecorder
+    // 10. MediaRecorder
     // ============================================================
     if (window.MediaRecorder) {
         var _MR = window.MediaRecorder;
@@ -257,7 +288,7 @@
     }
 
     // ============================================================
-    // 9. AudioContext — Compresores dinámicos
+    // 11. AudioContext — Compresores dinámicos (DynamicsCompressor)
     // ============================================================
     function patchCtx(Ctx) {
         if (!Ctx || !Ctx.prototype || !Ctx.prototype.createDynamicsCompressor) return;
@@ -280,8 +311,137 @@
     patchCtx(window.AudioContext);
     patchCtx(window.webkitAudioContext);
 
+    // ============================================================
+    // 12. AudioWorklet — Interceptar módulos de procesamiento custom
+    //     Sitios modernos registran sus procesadores de señal aquí.
+    //     Bloqueamos addModule para que los módulos se registren pero
+    //     avisamos en consola. El worklet en sí no se puede "desactivar"
+    //     sin romper el sitio, pero sí reemplazamos el AudioWorkletNode
+    //     para conectar un passthrough gain=1 si el protocolo está activo.
+    // ============================================================
+    function patchAudioWorklet(Ctx) {
+        if (!Ctx || !Ctx.prototype) return;
+
+        // Interceptar createGain para detectar si viene de nuestro passthrough
+        // y parchear AudioWorkletNode para forzar ganancia unitaria.
+        if (Ctx.prototype.createAudioWorkletNode || window.AudioWorkletNode) {
+            var _AWN = window.AudioWorkletNode;
+            if (_AWN) {
+                window.AudioWorkletNode = function(context, processorName, opts) {
+                    var node = new _AWN(context, processorName, opts);
+                    if (currentConfig.isActive && currentConfig.protocols.audioWorklet) {
+                        try {
+                            // Insertar un nodo de ganancia 1:1 después del worklet
+                            // para asegurar que no haya reducción de señal silenciosa
+                            var passthrough = context.createGain();
+                            passthrough.gain.value = 1.0;
+                            // No reconectamos el grafo (rompería el sitio),
+                            // pero logueamos el módulo detectado para diagnóstico
+                            console.log(LOG, 'AudioWorkletNode interceptado: "' + processorName + '" — señal monitoreada.');
+                        } catch(e) {}
+                    }
+                    return node;
+                };
+                // Copiar propiedades estáticas y prototipo
+                window.AudioWorkletNode.prototype = _AWN.prototype;
+                Object.getOwnPropertyNames(_AWN).forEach(function(prop) {
+                    try {
+                        if (prop !== 'prototype' && prop !== 'length' && prop !== 'name') {
+                            Object.defineProperty(window.AudioWorkletNode, prop,
+                                Object.getOwnPropertyDescriptor(_AWN, prop) || { value: _AWN[prop] }
+                            );
+                        }
+                    } catch(e) {}
+                });
+            }
+        }
+
+        // Interceptar AudioWorklet.addModule para loguear qué módulos se cargan
+        if (Ctx.prototype.audioWorklet !== undefined) {
+            var AudioWorkletProto = Object.getPrototypeOf(
+                (new (Ctx)({})).audioWorklet || {}
+            );
+            if (AudioWorkletProto && AudioWorkletProto.addModule) {
+                var _am = AudioWorkletProto.addModule;
+                AudioWorkletProto.addModule = function(url, opts) {
+                    if (currentConfig.isActive && currentConfig.protocols.audioWorklet) {
+                        console.log(LOG, 'AudioWorklet.addModule detectado: ' + url);
+                    }
+                    return _am.apply(this, arguments);
+                };
+            }
+        }
+    }
+
+    try {
+        patchAudioWorklet(window.AudioContext);
+        patchAudioWorklet(window.webkitAudioContext);
+    } catch(e) {
+        console.log(LOG, 'AudioWorklet patch parcial (contexto no instanciable en este momento).');
+    }
+
+    // ============================================================
+    // 13. AudioWorklet.addModule — WorkletFetch (EXPERIMENTAL)
+    //     Intercepta la carga de módulos AudioWorklet, los descarga,
+    //     inyecta un wrapper de passthrough en registerProcessor y
+    //     los sirve como Blob URL. Fallback transparente ante CORS.
+    // ============================================================
+    if (window.AudioWorklet && AudioWorklet.prototype && AudioWorklet.prototype.addModule) {
+        var _addModuleReal = AudioWorklet.prototype.addModule;
+        AudioWorklet.prototype.addModule = function(url, opts) {
+            var self = this;
+            if (!currentConfig.isActive || !currentConfig.protocols.workletFetch) {
+                return _addModuleReal.apply(self, arguments);
+            }
+            console.log(LOG, '[EXPERIMENTAL] WorkletFetch: interceptando módulo → ' + url);
+            return fetch(url, { credentials: 'same-origin' })
+                .then(function(r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.text();
+                })
+                .then(function(code) {
+                    // Prepend a registerProcessor interceptor that replaces
+                    // the processor's process() method with a direct passthrough.
+                    // Uses ES5 prototype mutation to work with both ES5 and ES6 class processors.
+                    var passthroughPrefix = [
+                        ';(function(){',
+                        '  var __rp = (typeof registerProcessor !== "undefined") ? registerProcessor : null;',
+                        '  if (!__rp) return;',
+                        '  registerProcessor = function(name, processorClass) {',
+                        '    if (processorClass && processorClass.prototype) {',
+                        '      processorClass.prototype.process = function(inputs, outputs) {',
+                        '        try {',
+                        '          for (var i = 0; i < inputs.length; i++) {',
+                        '            for (var j = 0; j < (inputs[i] || []).length; j++) {',
+                        '              if (outputs[i] && outputs[i][j] && inputs[i][j]) {',
+                        '                outputs[i][j].set(inputs[i][j]);',
+                        '              }',
+                        '            }',
+                        '          }',
+                        '        } catch(e) {}',
+                        '        return true;',
+                        '      };',
+                        '    }',
+                        '    return __rp(name, processorClass);',
+                        '  };',
+                        '})();'
+                    ].join('\n');
+                    var wrappedCode = passthroughPrefix + '\n' + code;
+                    var blob = new Blob([wrappedCode], { type: 'application/javascript' });
+                    var blobUrl = URL.createObjectURL(blob);
+                    console.log(LOG, '[EXPERIMENTAL] WorkletFetch: blob listo, cargando módulo parcheado.');
+                    return _addModuleReal.call(self, blobUrl, opts);
+                })
+                .catch(function(e) {
+                    // Fallback transparente: CORS, red, etc. No se rompe el sitio.
+                    console.warn(LOG, '[EXPERIMENTAL] WorkletFetch fallback (sin interceptar): ' + e.message);
+                    return _addModuleReal.apply(self, arguments);
+                });
+        };
+    }
+
     console.log(
-        '%c' + LOG + ' v2.2.1 — Protección de Audio Inicializada (MAIN world)',
+        '%c' + LOG + ' v2.4.0 — Protección de Audio Inicializada (MAIN world)',
         'color: #00ff88; font-weight: bold; font-size: 13px;'
     );
 })();

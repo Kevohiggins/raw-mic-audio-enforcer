@@ -10,7 +10,7 @@
         <div class="brand">
             <span class="brand-title">Raw Mic Enforcer</span>
         </div>
-        <span class="version">v2.2.1</span>
+        <span class="version">v2.4.0</span>
     </header>
 
     <!-- Switch Maestro -->
@@ -81,6 +81,46 @@
                 </div>
                 <label class="switch">
                     <input type="checkbox" id="protoMediaRecorder">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">AudioWorklet (Procesadores Custom)</div>
+                    <div class="protocol-desc">Detecta y monitorea módulos de audio de terceros</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoAudioWorklet">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Captura de Pantalla (getDisplayMedia)</div>
+                    <div class="protocol-desc">Elimina filtros de audio del sistema en capturas</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoDisplayMedia">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Encoded Transform (Passthrough)</div>
+                    <div class="protocol-desc">Fuerza passthrough en streams de audio codificado (Discord, etc)</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoEncodedTransform">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item protocol-item--experimental">
+                <div>
+                    <div class="protocol-label">WorkletFetch <span class="badge-experimental">Experimental</span></div>
+                    <div class="protocol-desc">Intercepta módulos AudioWorklet y fuerza passthrough. Puede romper sitios.</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoWorkletFetch">
                     <span class="slider"></span>
                 </label>
             </div>

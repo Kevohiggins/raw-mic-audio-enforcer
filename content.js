@@ -7,7 +7,11 @@ const DEFAULT_CONFIG = {
         killFilters: true,
         sdpMunge: true,
         compressorKill: true,
-        mediaRecorder: true
+        mediaRecorder: true,
+        audioWorklet: true,
+        displayMedia: true,
+        encodedTransform: true,
+        workletFetch: false
     }
 };
 
@@ -35,7 +39,7 @@ function sendConfigToMainWorld() {
             enabled: items.enabled !== undefined ? items.enabled : true,
             blacklist: items.blacklist || [],
             targetBitrate: items.targetBitrate || 320000,
-            protocols: items.protocols || DEFAULT_CONFIG.protocols
+            protocols: Object.assign({}, DEFAULT_CONFIG.protocols, items.protocols || {})
         };
 
         const isActive = checkIsActive(config);
@@ -51,7 +55,7 @@ function sendConfigToMainWorld() {
     });
 }
 
-// Enviar estado inicial nada más iniciar (asíncronamente, pero casi instantáneo)
+// Enviar estado inicial nada más iniciar
 sendConfigToMainWorld();
 
 // Enviar estado cada vez que se modifique en las opciones o popup
