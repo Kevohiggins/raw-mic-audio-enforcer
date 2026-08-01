@@ -14,15 +14,15 @@
     </header>
 
     <!-- Navegación de Pestañas -->
-    <nav class="nav-tabs" role="tablist" aria-label="Navegación de opciones">
-        <button class="tab-btn active" id="tabBtnGeneral" role="tab" aria-selected="true" aria-controls="panelGeneral">General</button>
-        <button class="tab-btn" id="tabBtnBlacklist" role="tab" aria-selected="false" aria-controls="panelBlacklist">Sitios Excluidos</button>
-        <button class="tab-btn" id="tabBtnProtocolos" role="tab" aria-selected="false" aria-controls="panelProtocolos">Protocolos</button>
-        <button class="tab-btn" id="tabBtnAbout" role="tab" aria-selected="false" aria-controls="panelAbout">Acerca del Autor</button>
+    <nav class="nav-tabs">
+        <button class="tab-btn active" id="tabBtnGeneral">General</button>
+        <button class="tab-btn" id="tabBtnBlacklist">Sitios Excluidos</button>
+        <button class="tab-btn" id="tabBtnProtocolos">Protocolos</button>
+        <button class="tab-btn" id="tabBtnAbout">Acerca del Autor</button>
     </nav>
 
     <!-- Pestaña 1: General -->
-    <div class="tab-panel active" id="panelGeneral" role="tabpanel" aria-labelledby="tabBtnGeneral">
+    <div class="tab-panel active" id="panelGeneral">
         <div class="options-card">
             <h2 class="options-title">Configuración General</h2>
             <div class="master-card" id="masterCard">
@@ -55,7 +55,7 @@
     </div>
 
     <!-- Pestaña 2: Sitios Excluidos (Lista Negra) -->
-    <div class="tab-panel" id="panelBlacklist" role="tabpanel" aria-labelledby="tabBtnBlacklist">
+    <div class="tab-panel" id="panelBlacklist">
         <div class="options-card">
             <h2 class="options-title">Sitios Excluidos (Lista Negra)</h2>
             <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
@@ -74,7 +74,7 @@
     </div>
 
     <!-- Pestaña 3: Protocolos -->
-    <div class="tab-panel" id="panelProtocolos" role="tabpanel" aria-labelledby="tabBtnProtocolos">
+    <div class="tab-panel" id="panelProtocolos">
         <div class="options-card">
             <h2 class="options-title">Personalización de Protocolos</h2>
             <div class="protocol-item">
@@ -181,7 +181,7 @@
     </div>
 
     <!-- Pestaña 4: Acerca del Autor -->
-    <div class="tab-panel" id="panelAbout" role="tabpanel" aria-labelledby="tabBtnAbout">
+    <div class="tab-panel" id="panelAbout">
         <div class="options-card">
             <h2 class="options-title" style="margin-bottom: 10px;">Acerca del Autor</h2>
             <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 15px;">

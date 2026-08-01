@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (b && p) {
                         const isActive = (t.btn === tab.btn);
                         b.classList.toggle('active', isActive);
-                        b.setAttribute('aria-selected', isActive ? 'true' : 'false');
                         p.classList.toggle('active', isActive);
                     }
                 });
