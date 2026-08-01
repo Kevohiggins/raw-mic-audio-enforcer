@@ -23,7 +23,7 @@
             </div>
         </div>
         <label class="switch">
-            <input type="checkbox" id="masterToggle">
+            <input type="checkbox" id="masterToggle" aria-label="Modo Audio Crudo">
             <span class="slider"></span>
         </label>
     </div>
@@ -50,7 +50,7 @@
                     <div class="protocol-desc">Bloquea el filtro que elimina la reverberación</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" id="protoKillEcho">
+                    <input type="checkbox" id="protoKillEcho" aria-label="Cancelación de Eco">
                     <span class="slider"></span>
                 </label>
             </div>
@@ -60,7 +60,7 @@
                     <div class="protocol-desc">Bloquea el filtro nativo que reduce ruido de fondo</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" id="protoKillNoise">
+                    <input type="checkbox" id="protoKillNoise" aria-label="Supresión de Ruido">
                     <span class="slider"></span>
                 </label>
             </div>
@@ -70,17 +70,17 @@
                     <div class="protocol-desc">Bloquea el ajuste automático de volumen del micrófono</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" id="protoKillGain">
+                    <input type="checkbox" id="protoKillGain" aria-label="Control de Ganancia">
                     <span class="slider"></span>
                 </label>
             </div>
             <div class="protocol-item">
                 <div>
-                    <div class="protocol-label">Intercepcin SDP Opus</div>
+                    <div class="protocol-label">Intercepción SDP Opus</div>
                     <div class="protocol-desc">Fuerza estéreo CBR con la calidad seleccionada</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" id="protoSdpMunge">
+                    <input type="checkbox" id="protoSdpMunge" aria-label="Intercepción SDP Opus">
                     <span class="slider"></span>
                 </label>
             </div>
@@ -90,17 +90,17 @@
                     <div class="protocol-desc">Anula compresores dinámicos de audio (ratio 1:1)</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" id="protoCompressorKill">
+                    <input type="checkbox" id="protoCompressorKill" aria-label="Neutralizar Compresores">
                     <span class="slider"></span>
                 </label>
             </div>
             <div class="protocol-item">
                 <div>
                     <div class="protocol-label">Calidad de Grabación</div>
-                    <div class="protocol-desc">Aplica la calidad seleccionada a grabaciones</div>
+                    <div class="protocol-desc">Fuerza la calidad seleccionada en grabaciones. Si está desactivado, la página decide la calidad.</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" id="protoMediaRecorder">
+                    <input type="checkbox" id="protoMediaRecorder" aria-label="Calidad de Grabación">
                     <span class="slider"></span>
                 </label>
             </div>
@@ -110,7 +110,7 @@
                     <div class="protocol-desc">Detecta y monitorea módulos de audio de terceros</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" id="protoAudioWorklet">
+                    <input type="checkbox" id="protoAudioWorklet" aria-label="Procesadores de Audio">
                     <span class="slider"></span>
                 </label>
             </div>
@@ -120,7 +120,7 @@
                     <div class="protocol-desc">Elimina filtros de audio del sistema en capturas</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" id="protoDisplayMedia">
+                    <input type="checkbox" id="protoDisplayMedia" aria-label="Audio en Captura de Pantalla">
                     <span class="slider"></span>
                 </label>
             </div>
@@ -130,7 +130,7 @@
                     <div class="protocol-desc">Fuerza passthrough en streams de audio codificado (Discord, etc)</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" id="protoEncodedTransform">
+                    <input type="checkbox" id="protoEncodedTransform" aria-label="Encoded Transform">
                     <span class="slider"></span>
                 </label>
             </div>
@@ -140,7 +140,7 @@
                     <div class="protocol-desc">Intercepta módulos AudioWorklet y fuerza passthrough. Puede romper sitios.</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" id="protoWorkletFetch">
+                    <input type="checkbox" id="protoWorkletFetch" aria-label="WorkletFetch Experimental">
                     <span class="slider"></span>
                 </label>
             </div>
