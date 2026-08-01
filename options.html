@@ -13,168 +13,186 @@
         <span class="version">v2.5.0</span>
     </header>
 
-    <!-- Estado Global -->
-    <div class="options-card">
-        <h2 class="options-title">Configuración General</h2>
-        <div class="master-card" id="masterCard">
-            <div class="master-info">
-                <h3>Modo Audio Crudo (Global)</h3>
-                <div class="status-badge" id="statusBadge">
-                    <span class="dot"></span>
-                    <span id="statusText">Desactivado</span>
+    <!-- Navegación de Pestañas -->
+    <nav class="nav-tabs" role="tablist" aria-label="Navegación de opciones">
+        <button class="tab-btn active" id="tabBtnGeneral" role="tab" aria-selected="true" aria-controls="panelGeneral">General</button>
+        <button class="tab-btn" id="tabBtnBlacklist" role="tab" aria-selected="false" aria-controls="panelBlacklist">Sitios Excluidos</button>
+        <button class="tab-btn" id="tabBtnProtocolos" role="tab" aria-selected="false" aria-controls="panelProtocolos">Protocolos</button>
+        <button class="tab-btn" id="tabBtnAbout" role="tab" aria-selected="false" aria-controls="panelAbout">Acerca del Autor</button>
+    </nav>
+
+    <!-- Pestaña 1: General -->
+    <div class="tab-panel active" id="panelGeneral" role="tabpanel" aria-labelledby="tabBtnGeneral">
+        <div class="options-card">
+            <h2 class="options-title">Configuración General</h2>
+            <div class="master-card" id="masterCard">
+                <div class="master-info">
+                    <h3>Modo Audio Crudo (Global)</h3>
+                    <div class="status-badge" id="statusBadge">
+                        <span class="dot"></span>
+                        <span id="statusText">Desactivado</span>
+                    </div>
                 </div>
+                <label class="switch">
+                    <input type="checkbox" id="masterToggle" aria-label="Modo Audio Crudo">
+                    <span class="slider"></span>
+                </label>
             </div>
-            <label class="switch">
-                <input type="checkbox" id="masterToggle" aria-label="Modo Audio Crudo">
-                <span class="slider"></span>
-            </label>
+            
+            <div class="protocol-item" style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
+                <div>
+                    <div class="protocol-label">Calidad de Audio (Global)</div>
+                    <div class="protocol-desc">Define la tasa de bits (bitrate) máxima para todas las intercepciones de audio.</div>
+                </div>
+                <select id="bitrateSelect" aria-label="Calidad de Audio Global" style="background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; cursor: pointer;">
+                    <option value="64000">64 kbps (Baja - Voz estándar)</option>
+                    <option value="128000">128 kbps (Normal - Excelente voz)</option>
+                    <option value="192000">192 kbps (Alta - Podcasts)</option>
+                    <option value="320000" selected>320 kbps (Estudio - Música/Reaper)</option>
+                </select>
+            </div>
         </div>
     </div>
 
-    <!-- Lista Negra de Dominios -->
-    <div class="options-card">
-        <h2 class="options-title">Sitios Excluidos (Lista Negra)</h2>
-        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
-            Las páginas agregadas a esta lista ignorarán el audio crudo y usarán el procesamiento nativo de la web (ej: Meet, Discord).
-        </p>
-        
-        <div class="domain-input-group">
-            <input type="text" id="inputDomain" class="input-domain" placeholder="ejemplo: meet.google.com">
-            <button class="btn-add" id="btnAddDomain">Agregar Sitio</button>
-        </div>
+    <!-- Pestaña 2: Sitios Excluidos (Lista Negra) -->
+    <div class="tab-panel" id="panelBlacklist" role="tabpanel" aria-labelledby="tabBtnBlacklist">
+        <div class="options-card">
+            <h2 class="options-title">Sitios Excluidos (Lista Negra)</h2>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                Las páginas agregadas a esta lista ignorarán el audio crudo y usarán el procesamiento nativo del navegador (ej: Meet, Discord).
+            </p>
+            
+            <div class="domain-input-group">
+                <input type="text" id="inputDomain" class="input-domain" placeholder="ejemplo: meet.google.com" aria-label="Dominio a agregar">
+                <button class="btn-add" id="btnAddDomain">Agregar Sitio</button>
+            </div>
 
-        <ul class="domain-list" id="domainList">
-            <!-- Dominios agregados dinámicamente -->
-        </ul>
-    </div>
-
-    <!-- Protocolos e Interceptores -->
-    <div class="options-card">
-        <h2 class="options-title">Personalización de Protocolos</h2>
-        <div class="protocol-item">
-            <div>
-                <div class="protocol-label">Bloquear Cancelación de Eco</div>
-                <div class="protocol-desc">Bloquea el filtro que elimina la reverberación y el eco del micrófono</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="protoKillEcho" aria-label="Bloquear cancelación de eco">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="protocol-item">
-            <div>
-                <div class="protocol-label">Bloquear Supresión de Ruido</div>
-                <div class="protocol-desc">Bloquea el filtro nativo del navegador que reduce el ruido de fondo</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="protoKillNoise" aria-label="Bloquear supresión de ruido">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="protocol-item">
-            <div>
-                <div class="protocol-label">Bloquear Control Automático de Ganancia</div>
-                <div class="protocol-desc">Bloquea el ajuste automático de volumen que sube y baja el nivel del micrófono</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="protoKillGain" aria-label="Bloquear control automático de ganancia">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="protocol-item">
-            <div>
-                <div class="protocol-label">Forzar Opus Estéreo (SDP)</div>
-                <div class="protocol-desc">Fuerza el códec Opus en estéreo CBR con la calidad seleccionada en llamadas WebRTC</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="protoSdpMunge" aria-label="Forzar Opus estéreo SDP">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="protocol-item">
-            <div>
-                <div class="protocol-label">Neutralizar Compresores Dinámicos</div>
-                <div class="protocol-desc">Anula los compresores dinámicos de Web Audio (ratio 1:1)</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="protoCompressorKill" aria-label="Neutralizar compresores dinámicos">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="protocol-item">
-            <div>
-                <div class="protocol-label">Forzar Calidad en Grabaciones</div>
-                <div class="protocol-desc">Fuerza la calidad seleccionada en grabaciones. Si está desactivado, la página decide la calidad.</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="protoMediaRecorder" aria-label="Forzar calidad en grabaciones">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="protocol-item">
-            <div>
-                <div class="protocol-label">Monitorear Procesadores de Audio</div>
-                <div class="protocol-desc">Detecta y monitorea módulos de audio personalizados usados por sitios como Discord o Zoom</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="protoAudioWorklet" aria-label="Monitorear procesadores de audio">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="protocol-item">
-            <div>
-                <div class="protocol-label">Bloquear Filtros al Compartir Pantalla</div>
-                <div class="protocol-desc">Elimina filtros de procesamiento de audio del sistema al compartir pantalla con audio</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="protoDisplayMedia" aria-label="Bloquear filtros al compartir pantalla">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="protocol-item">
-            <div>
-                <div class="protocol-label">Forzar Passthrough en Encoded Transform</div>
-                <div class="protocol-desc">Fuerza passthrough en pipelines de audio codificado de baja latencia (Discord, Zoom avanzado)</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="protoEncodedTransform" aria-label="Forzar passthrough en Encoded Transform">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="protocol-item protocol-item--experimental">
-            <div>
-                <div class="protocol-label">WorkletFetch <span class="badge-experimental">Experimental</span></div>
-                <div class="protocol-desc">Descarga e intercepta módulos AudioWorklet en tiempo real, forzando passthrough puro en sus procesadores. Puede romper sitios con módulos CORS o muy complejos. Desactivado por defecto.</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="protoWorkletFetch" aria-label="Forzar passthrough en WorkletFetch experimental">
-                <span class="slider"></span>
-            </label>
-        </div>
-            <div>
-                <div class="protocol-label">Calidad de Audio (Global)</div>
-                <div class="protocol-desc">Define el Bitrate máximo para todas las intercepciones.</div>
-            </div>
-            <select id="bitrateSelect" style="background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 5px 10px; border-radius: 4px; font-family: inherit; font-size: 13px; cursor: pointer;">
-                <option value="64000">64 kbps (Baja - Voz estándar)</option>
-                <option value="128000">128 kbps (Normal - Excelente voz)</option>
-                <option value="192000">192 kbps (Alta - Podcasts)</option>
-                <option value="320000" selected>320 kbps (Estudio - Música/Reaper)</option>
-            </select>
+            <ul class="domain-list" id="domainList">
+                <!-- Dominios agregados dinámicamente -->
+            </ul>
         </div>
     </div>
 
-    <!-- Autor y Soporte -->
-    <div class="options-card" style="margin-top: 30px; border-top: 2px solid var(--border); padding-top: 20px;">
-        <h2 class="options-title" style="margin-bottom: 10px;">Acerca del Autor</h2>
-        <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 15px;">
-            Extensión dirigida y diseñada por <strong>Kevin O'Higgins</strong>, e impulsada por el código de <strong>Gemini</strong>.<br><br>
-            Si esto te pareció útil, y querés regalarme una birra, abajo tenés los botones para hacerlo. También podés contactarme, aunque si me donás posiblemente te dé más bola.
+    <!-- Pestaña 3: Protocolos -->
+    <div class="tab-panel" id="panelProtocolos" role="tabpanel" aria-labelledby="tabBtnProtocolos">
+        <div class="options-card">
+            <h2 class="options-title">Personalización de Protocolos</h2>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Bloquear Cancelación de Eco</div>
+                    <div class="protocol-desc">Bloquea el filtro que elimina la reverberación y el eco del micrófono</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoKillEcho" aria-label="Bloquear cancelación de eco">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Bloquear Supresión de Ruido</div>
+                    <div class="protocol-desc">Bloquea el filtro nativo del navegador que reduce el ruido de fondo</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoKillNoise" aria-label="Bloquear supresión de ruido">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Bloquear Control Automático de Ganancia</div>
+                    <div class="protocol-desc">Bloquea el ajuste automático de volumen que sube y baja el nivel del micrófono</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoKillGain" aria-label="Bloquear control automático de ganancia">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Forzar Opus Estéreo (SDP)</div>
+                    <div class="protocol-desc">Fuerza el códec Opus en estéreo CBR con la calidad seleccionada en llamadas WebRTC</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoSdpMunge" aria-label="Forzar Opus estéreo SDP">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Neutralizar Compresores Dinámicos</div>
+                    <div class="protocol-desc">Anula los compresores dinámicos de Web Audio (ratio 1:1)</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoCompressorKill" aria-label="Neutralizar compresores dinámicos">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Forzar Calidad en Grabaciones</div>
+                    <div class="protocol-desc">Fuerza la calidad seleccionada en grabaciones. Si está desactivado, la página decide la calidad.</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoMediaRecorder" aria-label="Forzar calidad en grabaciones">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Monitorear Procesadores de Audio</div>
+                    <div class="protocol-desc">Detecta y monitorea módulos de audio personalizados usados por sitios como Discord o Zoom</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoAudioWorklet" aria-label="Monitorear procesadores de audio">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Bloquear Filtros al Compartir Pantalla</div>
+                    <div class="protocol-desc">Elimina filtros de procesamiento de audio del sistema al compartir pantalla con audio</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoDisplayMedia" aria-label="Bloquear filtros al compartir pantalla">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Forzar Passthrough en Encoded Transform</div>
+                    <div class="protocol-desc">Fuerza passthrough en pipelines de audio codificado de baja latencia (Discord, Zoom avanzado)</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoEncodedTransform" aria-label="Forzar passthrough en Encoded Transform">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item protocol-item--experimental">
+                <div>
+                    <div class="protocol-label">WorkletFetch <span class="badge-experimental">Experimental</span></div>
+                    <div class="protocol-desc">Descarga e intercepta módulos AudioWorklet en tiempo real, forzando passthrough puro en sus procesadores. Puede romper sitios con módulos CORS o muy complejos. Desactivado por defecto.</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoWorkletFetch" aria-label="Forzar passthrough en WorkletFetch experimental">
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="https://kevohiggins.github.io/contactame" target="_blank" rel="noopener noreferrer" style="background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; cursor: pointer; transition: 0.2s;">Contacto / Feedback</a>
-            <a href="https://link.mercadopago.com.ar/kevohiggins" target="_blank" rel="noopener noreferrer" style="background: var(--primary); border: 1px solid var(--primary); color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; cursor: pointer; transition: 0.2s; font-weight: bold;">Donar (MercadoPago)</a>
-            <a href="https://www.paypal.me/KevOHiggins" target="_blank" rel="noopener noreferrer" style="background: var(--primary); border: 1px solid var(--primary); color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; cursor: pointer; transition: 0.2s; font-weight: bold;">Donar (PayPal)</a>
+    </div>
+
+    <!-- Pestaña 4: Acerca del Autor -->
+    <div class="tab-panel" id="panelAbout" role="tabpanel" aria-labelledby="tabBtnAbout">
+        <div class="options-card">
+            <h2 class="options-title" style="margin-bottom: 10px;">Acerca del Autor</h2>
+            <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 15px;">
+                Extensión dirigida y diseñada por <strong>Kevin O'Higgins</strong>, e impulsada por el código de <strong>Gemini</strong>.<br><br>
+                Si esto te pareció útil, y querés regalarme una birra, abajo tenés los botones para hacerlo. También podés contactarme, aunque si me donás posiblemente te dé más bola.
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="https://kevohiggins.github.io/contactame" target="_blank" rel="noopener noreferrer" style="background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main); padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; cursor: pointer; transition: 0.2s;">Contacto / Feedback</a>
+                <a href="https://link.mercadopago.com.ar/kevohiggins" target="_blank" rel="noopener noreferrer" style="background: var(--accent-green); border: 1px solid var(--accent-green); color: #0b0f19; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; cursor: pointer; transition: 0.2s; font-weight: bold;">Donar (MercadoPago)</a>
+                <a href="https://www.paypal.me/KevOHiggins" target="_blank" rel="noopener noreferrer" style="background: var(--accent-green); border: 1px solid var(--accent-green); color: #0b0f19; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; cursor: pointer; transition: 0.2s; font-weight: bold;">Donar (PayPal)</a>
+            </div>
         </div>
     </div>
 

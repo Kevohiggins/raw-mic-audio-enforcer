@@ -19,6 +19,32 @@ const DEFAULT_CONFIG = {
 document.addEventListener('DOMContentLoaded', () => {
     loadOptions();
 
+    // Navegación de Pestañas
+    const tabMapping = [
+        { btn: 'tabBtnGeneral', panel: 'panelGeneral' },
+        { btn: 'tabBtnBlacklist', panel: 'panelBlacklist' },
+        { btn: 'tabBtnProtocolos', panel: 'panelProtocolos' },
+        { btn: 'tabBtnAbout', panel: 'panelAbout' }
+    ];
+
+    tabMapping.forEach(tab => {
+        const btnEl = document.getElementById(tab.btn);
+        if (btnEl) {
+            btnEl.addEventListener('click', () => {
+                tabMapping.forEach(t => {
+                    const b = document.getElementById(t.btn);
+                    const p = document.getElementById(t.panel);
+                    if (b && p) {
+                        const isActive = (t.btn === tab.btn);
+                        b.classList.toggle('active', isActive);
+                        b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                        p.classList.toggle('active', isActive);
+                    }
+                });
+            });
+        }
+    });
+
     // Switch Maestro
     document.getElementById('masterToggle').addEventListener('change', (e) => {
         const enabled = e.target.checked;
