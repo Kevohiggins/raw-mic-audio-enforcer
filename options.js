@@ -12,7 +12,8 @@ const DEFAULT_CONFIG = {
         audioWorklet: true,
         displayMedia: true,
         encodedTransform: true,
-        workletFetch: false
+        workletFetch: false,
+        forceStereoNode: false
     }
 };
 
@@ -59,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Switchees de Protocolos
-    const protoKeys = ['killEcho', 'killNoise', 'killGain', 'sdpMunge', 'compressorKill', 'mediaRecorder', 'audioWorklet', 'displayMedia', 'encodedTransform', 'workletFetch'];
+    const protoKeys = ['killEcho', 'killNoise', 'killGain', 'sdpMunge', 'compressorKill', 'mediaRecorder', 'audioWorklet', 'displayMedia', 'encodedTransform', 'workletFetch', 'forceStereoNode'];
     protoKeys.forEach(key => {
         const id = 'proto' + key.charAt(0).toUpperCase() + key.slice(1);
         const input = document.getElementById(id);
@@ -106,6 +107,7 @@ function loadOptions() {
         document.getElementById('protoDisplayMedia').checked = protocols.displayMedia !== false;
         document.getElementById('protoEncodedTransform').checked = protocols.encodedTransform !== false;
         document.getElementById('protoWorkletFetch').checked = !!protocols.workletFetch;
+        document.getElementById('protoForceStereoNode').checked = !!protocols.forceStereoNode;
     });
 }
 
@@ -195,7 +197,8 @@ function saveProtocols() {
         audioWorklet: document.getElementById('protoAudioWorklet').checked,
         displayMedia: document.getElementById('protoDisplayMedia').checked,
         encodedTransform: document.getElementById('protoEncodedTransform').checked,
-        workletFetch: document.getElementById('protoWorkletFetch').checked
+        workletFetch: document.getElementById('protoWorkletFetch').checked,
+        forceStereoNode: document.getElementById('protoForceStereoNode').checked
     };
     chrome.storage.local.set({ protocols: protocols });
 }

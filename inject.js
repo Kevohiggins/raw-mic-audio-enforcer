@@ -27,7 +27,8 @@
             mediaRecorder: true,
             audioWorklet: true,
             displayMedia: true,
-            encodedTransform: true
+            encodedTransform: true,
+            forceStereoNode: false
         }
     };
 
@@ -499,6 +500,49 @@
                     return _addModuleReal.apply(self, arguments);
                 });
         };
+    }
+
+    // ============================================================
+    // 14. AudioNode — Forzar Estéreo (EXPERIMENTAL)
+    //     Intercepta channelCount y channelCountMode para obligar
+    //     a los nodos de Web Audio a procesar en estéreo.
+    // ============================================================
+    if (window.AudioNode && AudioNode.prototype) {
+        try {
+            var _cc = Object.getOwnPropertyDescriptor(AudioNode.prototype, 'channelCount');
+            var _ccm = Object.getOwnPropertyDescriptor(AudioNode.prototype, 'channelCountMode');
+
+            if (_cc && _cc.set) {
+                var _ccSet = _cc.set;
+                Object.defineProperty(AudioNode.prototype, 'channelCount', {
+                    get: function() { return _cc.get.call(this); },
+                    set: function(val) {
+                        if (currentConfig.isActive && currentConfig.protocols.forceStereoNode && val === 1) {
+                            console.log(LOG, '[EXPERIMENTAL] channelCount interceptado: forzando 2 canales en lugar de ' + val);
+                            val = 2;
+                        }
+                        _ccSet.call(this, val);
+                    },
+                    configurable: true
+                });
+            }
+
+            if (_ccm && _ccm.set) {
+                var _ccmSet = _ccm.set;
+                Object.defineProperty(AudioNode.prototype, 'channelCountMode', {
+                    get: function() { return _ccm.get.call(this); },
+                    set: function(val) {
+                        if (currentConfig.isActive && currentConfig.protocols.forceStereoNode) {
+                            val = 'explicit';
+                        }
+                        _ccmSet.call(this, val);
+                    },
+                    configurable: true
+                });
+            }
+        } catch(e) {
+            console.log(LOG, 'Error al parchear AudioNode.prototype: ' + e.message);
+        }
     }
 
     console.log(

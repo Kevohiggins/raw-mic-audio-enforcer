@@ -13,7 +13,8 @@ const DEFAULT_CONFIG = {
         audioWorklet: true,
         displayMedia: true,
         encodedTransform: true,
-        workletFetch: false
+        workletFetch: false,
+        forceStereoNode: false
     }
 };
 
