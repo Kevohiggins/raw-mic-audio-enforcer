@@ -53,91 +53,91 @@
         <h2 class="options-title">Personalización de Protocolos</h2>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Cancelación de Eco</div>
+                <div class="protocol-label">Bloquear Cancelación de Eco</div>
                 <div class="protocol-desc">Bloquea el filtro que elimina la reverberación y el eco del micrófono</div>
             </div>
             <label class="switch">
-                <input type="checkbox" id="protoKillEcho" aria-label="Cancelación de Eco">
+                <input type="checkbox" id="protoKillEcho" aria-label="Bloquear cancelación de eco">
                 <span class="slider"></span>
             </label>
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Supresión de Ruido</div>
+                <div class="protocol-label">Bloquear Supresión de Ruido</div>
                 <div class="protocol-desc">Bloquea el filtro nativo del navegador que reduce el ruido de fondo</div>
             </div>
             <label class="switch">
-                <input type="checkbox" id="protoKillNoise" aria-label="Supresión de Ruido">
+                <input type="checkbox" id="protoKillNoise" aria-label="Bloquear supresión de ruido">
                 <span class="slider"></span>
             </label>
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Control Automático de Ganancia</div>
+                <div class="protocol-label">Bloquear Control Automático de Ganancia</div>
                 <div class="protocol-desc">Bloquea el ajuste automático de volumen que sube y baja el nivel del micrófono</div>
             </div>
             <label class="switch">
-                <input type="checkbox" id="protoKillGain" aria-label="Control Automático de Ganancia">
+                <input type="checkbox" id="protoKillGain" aria-label="Bloquear control automático de ganancia">
                 <span class="slider"></span>
             </label>
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Intercepción SDP Opus</div>
+                <div class="protocol-label">Forzar Opus Estéreo (SDP)</div>
                 <div class="protocol-desc">Fuerza el códec Opus en estéreo CBR con la calidad seleccionada en llamadas WebRTC</div>
             </div>
             <label class="switch">
-                <input type="checkbox" id="protoSdpMunge" aria-label="Intercepción SDP Opus">
+                <input type="checkbox" id="protoSdpMunge" aria-label="Forzar Opus estéreo SDP">
                 <span class="slider"></span>
             </label>
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Neutralizar Compresores</div>
+                <div class="protocol-label">Neutralizar Compresores Dinámicos</div>
                 <div class="protocol-desc">Anula los compresores dinámicos de Web Audio (ratio 1:1)</div>
             </div>
             <label class="switch">
-                <input type="checkbox" id="protoCompressorKill" aria-label="Neutralizar Compresores">
+                <input type="checkbox" id="protoCompressorKill" aria-label="Neutralizar compresores dinámicos">
                 <span class="slider"></span>
             </label>
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Calidad de Grabación</div>
+                <div class="protocol-label">Forzar Calidad en Grabaciones</div>
                 <div class="protocol-desc">Fuerza la calidad seleccionada en grabaciones. Si está desactivado, la página decide la calidad.</div>
             </div>
             <label class="switch">
-                <input type="checkbox" id="protoMediaRecorder" aria-label="Calidad de Grabación">
+                <input type="checkbox" id="protoMediaRecorder" aria-label="Forzar calidad en grabaciones">
                 <span class="slider"></span>
             </label>
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Procesadores de Audio (AudioWorklet)</div>
+                <div class="protocol-label">Monitorear Procesadores de Audio</div>
                 <div class="protocol-desc">Detecta y monitorea módulos de audio personalizados usados por sitios como Discord o Zoom</div>
             </div>
             <label class="switch">
-                <input type="checkbox" id="protoAudioWorklet" aria-label="Procesadores de Audio">
+                <input type="checkbox" id="protoAudioWorklet" aria-label="Monitorear procesadores de audio">
                 <span class="slider"></span>
             </label>
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Audio en Captura de Pantalla</div>
+                <div class="protocol-label">Bloquear Filtros al Compartir Pantalla</div>
                 <div class="protocol-desc">Elimina filtros de procesamiento de audio del sistema al compartir pantalla con audio</div>
             </div>
             <label class="switch">
-                <input type="checkbox" id="protoDisplayMedia" aria-label="Audio en Captura de Pantalla">
+                <input type="checkbox" id="protoDisplayMedia" aria-label="Bloquear filtros al compartir pantalla">
                 <span class="slider"></span>
             </label>
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Encoded Transform (Passthrough)</div>
+                <div class="protocol-label">Forzar Passthrough en Encoded Transform</div>
                 <div class="protocol-desc">Fuerza passthrough en pipelines de audio codificado de baja latencia (Discord, Zoom avanzado)</div>
             </div>
             <label class="switch">
-                <input type="checkbox" id="protoEncodedTransform" aria-label="Encoded Transform">
+                <input type="checkbox" id="protoEncodedTransform" aria-label="Forzar passthrough en Encoded Transform">
                 <span class="slider"></span>
             </label>
         </div>
@@ -147,7 +147,7 @@
                 <div class="protocol-desc">Descarga e intercepta módulos AudioWorklet en tiempo real, forzando passthrough puro en sus procesadores. Puede romper sitios con módulos CORS o muy complejos. Desactivado por defecto.</div>
             </div>
             <label class="switch">
-                <input type="checkbox" id="protoWorkletFetch" aria-label="WorkletFetch Experimental">
+                <input type="checkbox" id="protoWorkletFetch" aria-label="Forzar passthrough en WorkletFetch experimental">
                 <span class="slider"></span>
             </label>
         </div>
