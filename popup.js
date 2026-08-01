@@ -118,10 +118,10 @@ function updateMasterUI(enabled) {
     const statusText = document.getElementById('statusText');
     if (enabled) {
         card.classList.add('active');
-        statusText.textContent = 'Modo RAW Activo';
+        statusText.textContent = 'Activo';
     } else {
         card.classList.remove('active');
-        statusText.textContent = 'Desactivado (Nativo)';
+        statusText.textContent = 'Desactivado';
     }
 }
 

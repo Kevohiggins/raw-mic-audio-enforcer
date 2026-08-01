@@ -27,24 +27,24 @@
             <h2 class="options-title">Configuración General</h2>
             <div class="master-card" id="masterCard">
                 <div class="master-info">
-                    <h3>Modo Audio Crudo (Global)</h3>
+                    <h3>Audio Sin Procesar</h3>
                     <div class="status-badge" id="statusBadge">
                         <span class="dot"></span>
                         <span id="statusText">Desactivado</span>
                     </div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" id="masterToggle" aria-label="Modo Audio Crudo">
+                    <input type="checkbox" id="masterToggle" aria-label="Audio Sin Procesar">
                     <span class="slider"></span>
                 </label>
             </div>
             
             <div class="protocol-item" style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
                 <div>
-                    <div class="protocol-label">Calidad de Audio (Global)</div>
+                    <div class="protocol-label">Calidad de Audio</div>
                     <div class="protocol-desc">Define la tasa de bits (bitrate) máxima para todas las intercepciones de audio.</div>
                 </div>
-                <select id="bitrateSelect" aria-label="Calidad de Audio Global" style="background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; cursor: pointer;">
+                <select id="bitrateSelect" aria-label="Calidad de Audio" style="background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; cursor: pointer;">
                     <option value="64000">64 kbps (Baja - Voz estándar)</option>
                     <option value="128000">128 kbps (Normal - Excelente voz)</option>
                     <option value="192000">192 kbps (Alta - Podcasts)</option>
