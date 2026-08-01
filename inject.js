@@ -31,12 +31,42 @@
         }
     };
 
+    // Tracks de audio activos para re-aplicar filtros en tiempo real
+    var activeTracks = [];
+
+    function cleanupTracks() {
+        activeTracks = activeTracks.filter(function(t) {
+            return t.readyState === 'live';
+        });
+    }
+
+    function reapplyFilters() {
+        cleanupTracks();
+        if (activeTracks.length === 0) return;
+        var p = currentConfig.protocols;
+        var c = {};
+        ECHO_FILTERS.forEach(function(f) { c[f] = p.killEcho ? false : undefined; });
+        NOISE_FILTERS.forEach(function(f) { c[f] = p.killNoise ? false : undefined; });
+        GAIN_FILTERS.forEach(function(f) { c[f] = p.killGain ? false : undefined; });
+        // Limpiar las propiedades undefined
+        var clean = {};
+        Object.keys(c).forEach(function(k) { if (c[k] !== undefined) clean[k] = c[k]; });
+        clean.channelCount = 2;
+        activeTracks.forEach(function(track) {
+            try {
+                track.applyConstraints(clean);
+            } catch(e) {}
+        });
+        console.log(LOG, 'Filtros re-aplicados en ' + activeTracks.length + ' track(s) activo(s).');
+    }
+
     // Escuchar actualizaciones dinámicas desde content.js
     window.addEventListener('message', function(event) {
         if (event && event.data && event.data.type === 'RAW_MIC_CONFIG_UPDATE') {
             if (event.data.config) {
                 currentConfig = event.data.config;
                 console.log(LOG, 'Estado actualizado:', currentConfig);
+                reapplyFilters();
             }
         }
     });
@@ -134,7 +164,12 @@
             if (currentConfig.isActive) {
                 console.log(LOG, 'getUserMedia interceptado.', c);
             }
-            return _gum(c);
+            return _gum(c).then(function(stream) {
+                var audioTracks = stream.getAudioTracks();
+                audioTracks.forEach(function(t) { activeTracks.push(t); });
+                cleanupTracks();
+                return stream;
+            });
         };
     }
 
