@@ -10,7 +10,7 @@
         <div class="brand">
             <span class="brand-title">Raw Mic Audio Enforcer — Opciones</span>
         </div>
-        <span class="version">v2.4.0</span>
+        <span class="version">v2.5.0</span>
     </header>
 
     <!-- Estado Global -->
@@ -53,18 +53,38 @@
         <h2 class="options-title">Personalización de Protocolos</h2>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Filtros de Micrófono (killFilters)</div>
-                <div class="protocol-desc">Desactiva echoCancellation, noiseSuppression y autoGainControl</div>
+                <div class="protocol-label">Cancelación de Eco</div>
+                <div class="protocol-desc">Bloquea el filtro que elimina la reverberación y el eco del micrófono</div>
             </div>
             <label class="switch">
-                <input type="checkbox" id="protoKillFilters">
+                <input type="checkbox" id="protoKillEcho">
                 <span class="slider"></span>
             </label>
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">SDP Munging (sdpMunge)</div>
-                <div class="protocol-desc">Fuerza el códec Opus en estéreo CBR con la calidad seleccionada en RTCPeerConnection</div>
+                <div class="protocol-label">Supresión de Ruido</div>
+                <div class="protocol-desc">Bloquea el filtro nativo del navegador que reduce el ruido de fondo</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="protoKillNoise">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="protocol-item">
+            <div>
+                <div class="protocol-label">Control Automático de Ganancia</div>
+                <div class="protocol-desc">Bloquea el ajuste automático de volumen que sube y baja el nivel del micrófono</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="protoKillGain">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="protocol-item">
+            <div>
+                <div class="protocol-label">Intercepcin SDP Opus</div>
+                <div class="protocol-desc">Fuerza el códec Opus en estéreo CBR con la calidad seleccionada en llamadas WebRTC</div>
             </div>
             <label class="switch">
                 <input type="checkbox" id="protoSdpMunge">
@@ -73,8 +93,8 @@
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Anular Compresores (compressorKill)</div>
-                <div class="protocol-desc">Neutraliza el DynamicsCompressor de Web Audio (Ratio 1:1)</div>
+                <div class="protocol-label">Neutralizar Compresores</div>
+                <div class="protocol-desc">Anula los compresores dinámicos de Web Audio (ratio 1:1)</div>
             </div>
             <label class="switch">
                 <input type="checkbox" id="protoCompressorKill">
@@ -83,7 +103,7 @@
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Bitrate de Grabación (mediaRecorder)</div>
+                <div class="protocol-label">Calidad de Grabación</div>
                 <div class="protocol-desc">Aplica la calidad seleccionada a las grabaciones hechas con MediaRecorder</div>
             </div>
             <label class="switch">
@@ -93,7 +113,7 @@
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">AudioWorklet (Procesadores Custom)</div>
+                <div class="protocol-label">Procesadores de Audio (AudioWorklet)</div>
                 <div class="protocol-desc">Detecta y monitorea módulos de audio personalizados usados por sitios como Discord o Zoom</div>
             </div>
             <label class="switch">
@@ -103,7 +123,7 @@
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Captura de Pantalla — getDisplayMedia</div>
+                <div class="protocol-label">Audio en Captura de Pantalla</div>
                 <div class="protocol-desc">Elimina filtros de procesamiento de audio del sistema al compartir pantalla con audio</div>
             </div>
             <label class="switch">
@@ -113,7 +133,7 @@
         </div>
         <div class="protocol-item">
             <div>
-                <div class="protocol-label">Encoded Transform API (Passthrough)</div>
+                <div class="protocol-label">Encoded Transform (Passthrough)</div>
                 <div class="protocol-desc">Fuerza passthrough en pipelines de audio codificado de baja latencia (Discord, Zoom avanzado)</div>
             </div>
             <label class="switch">

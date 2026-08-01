@@ -4,7 +4,9 @@ const DEFAULT_CONFIG = {
     blacklist: [],
     targetBitrate: 320000,
     protocols: {
-        killFilters: true,
+        killEcho: true,
+        killNoise: true,
+        killGain: true,
         sdpMunge: true,
         compressorKill: true,
         mediaRecorder: true,

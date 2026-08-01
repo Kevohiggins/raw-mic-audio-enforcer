@@ -1,6 +1,6 @@
 (function() {
     // ============================================================
-    // RAW MIC AUDIO ENFORCER v2.3.0
+    // RAW MIC AUDIO ENFORCER v2.5.0
     // Intercepción dinámica de audio WebRTC / Web Audio.
     // ============================================================
     if (window.__rawMicEnforcerInjected) return;
@@ -19,7 +19,9 @@
         isActive: true,
         targetBitrate: 320000,
         protocols: {
-            killFilters: true,
+            killEcho: true,
+            killNoise: true,
+            killGain: true,
             sdpMunge: true,
             compressorKill: true,
             mediaRecorder: true,
@@ -42,19 +44,20 @@
     // Solicitar estado a content.js inmediatamente
     window.postMessage({ type: 'RAW_MIC_REQUEST_CONFIG' }, '*');
 
-    // Propiedades de procesamiento de audio a desactivar
-    var AUDIO_KILL = [
-        'echoCancellation', 'noiseSuppression', 'autoGainControl',
-        'googEchoCancellation', 'googAutoGainControl', 'googNoiseSuppression',
-        'googHighpassFilter', 'googAudioMirroring', 'googNoiseReduction',
-        'googTypingNoiseDetection', 'googBeamforming', 'voiceIsolation'
-    ];
+    // Grupos de filtros separados por categoría
+    var ECHO_FILTERS = ['echoCancellation', 'googEchoCancellation'];
+    var NOISE_FILTERS = ['noiseSuppression', 'googNoiseSuppression',
+        'googHighpassFilter', 'googNoiseReduction',
+        'googTypingNoiseDetection', 'googBeamforming', 'voiceIsolation'];
+    var GAIN_FILTERS = ['autoGainControl', 'googAutoGainControl', 'googAudioMirroring'];
 
     // ============================================================
-    // 1. HELPER: Desactivar todos los filtros en constraints de audio
+    // 1. HELPER: Desactivar filtros según la configuración individual
     // ============================================================
     function killFilters(constraints) {
-        if (!currentConfig.isActive || !currentConfig.protocols.killFilters) return;
+        if (!currentConfig.isActive) return;
+        var p = currentConfig.protocols;
+        if (!p.killEcho && !p.killNoise && !p.killGain) return;
         if (!constraints || !constraints.audio) return;
 
         if (constraints.audio === true) {
@@ -62,16 +65,27 @@
         }
 
         if (typeof constraints.audio === 'object') {
-            AUDIO_KILL.forEach(function(p) { constraints.audio[p] = false; });
+            var filtersToKill = [];
+            if (p.killEcho) filtersToKill = filtersToKill.concat(ECHO_FILTERS);
+            if (p.killNoise) filtersToKill = filtersToKill.concat(NOISE_FILTERS);
+            if (p.killGain) filtersToKill = filtersToKill.concat(GAIN_FILTERS);
+
+            filtersToKill.forEach(function(f) { constraints.audio[f] = false; });
             constraints.audio.channelCount = 2;
 
             if (Array.isArray(constraints.audio.advanced)) {
                 constraints.audio.advanced.forEach(function(adv) {
-                    AUDIO_KILL.forEach(function(p) {
-                        if (adv[p] !== undefined) adv[p] = false;
+                    filtersToKill.forEach(function(f) {
+                        if (adv[f] !== undefined) adv[f] = false;
                     });
                 });
             }
+
+            var killed = [];
+            if (p.killEcho) killed.push('eco');
+            if (p.killNoise) killed.push('ruido');
+            if (p.killGain) killed.push('ganancia');
+            console.log(LOG, 'Filtros bloqueados: ' + killed.join(', '));
         }
     }
 
@@ -116,8 +130,8 @@
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         var _gum = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
         navigator.mediaDevices.getUserMedia = function(c) {
-            if (currentConfig.isActive && currentConfig.protocols.killFilters) {
-                killFilters(c);
+            killFilters(c);
+            if (currentConfig.isActive) {
                 console.log(LOG, 'getUserMedia interceptado.', c);
             }
             return _gum(c);
@@ -134,7 +148,12 @@
                 c = c || {};
                 if (c.audio === true) c.audio = {};
                 if (typeof c.audio === 'object') {
-                    AUDIO_KILL.forEach(function(p) { c.audio[p] = false; });
+                    var p = currentConfig.protocols;
+                    var filtersToKill = [];
+                    if (p.killEcho) filtersToKill = filtersToKill.concat(ECHO_FILTERS);
+                    if (p.killNoise) filtersToKill = filtersToKill.concat(NOISE_FILTERS);
+                    if (p.killGain) filtersToKill = filtersToKill.concat(GAIN_FILTERS);
+                    filtersToKill.forEach(function(f) { c.audio[f] = false; });
                     console.log(LOG, 'getDisplayMedia interceptado — filtros de audio del sistema bloqueados.');
                 }
             }
@@ -149,8 +168,8 @@
         if (navigator[fn]) {
             var _orig = navigator[fn].bind(navigator);
             navigator[fn] = function(c, ok, err) {
-                if (currentConfig.isActive && currentConfig.protocols.killFilters) {
-                    killFilters(c);
+                killFilters(c);
+                if (currentConfig.isActive) {
                     console.log(LOG, fn + ' legacy interceptado.');
                 }
                 return _orig(c, ok, err);
@@ -252,19 +271,26 @@
     if (window.MediaStreamTrack && MediaStreamTrack.prototype.applyConstraints) {
         var _ac = MediaStreamTrack.prototype.applyConstraints;
         MediaStreamTrack.prototype.applyConstraints = function(c) {
-            if (currentConfig.isActive && currentConfig.protocols.killFilters && this.kind === 'audio' && c) {
-                AUDIO_KILL.forEach(function(p) {
-                    if (c[p] !== undefined) c[p] = false;
-                });
-                if (Array.isArray(c.advanced)) {
-                    c.advanced.forEach(function(adv) {
-                        AUDIO_KILL.forEach(function(p) {
-                            if (adv[p] !== undefined) adv[p] = false;
-                        });
+            if (currentConfig.isActive && this.kind === 'audio' && c) {
+                var pr = currentConfig.protocols;
+                if (pr.killEcho || pr.killNoise || pr.killGain) {
+                    var filtersToKill = [];
+                    if (pr.killEcho) filtersToKill = filtersToKill.concat(ECHO_FILTERS);
+                    if (pr.killNoise) filtersToKill = filtersToKill.concat(NOISE_FILTERS);
+                    if (pr.killGain) filtersToKill = filtersToKill.concat(GAIN_FILTERS);
+                    filtersToKill.forEach(function(f) {
+                        if (c[f] !== undefined) c[f] = false;
                     });
+                    if (Array.isArray(c.advanced)) {
+                        c.advanced.forEach(function(adv) {
+                            filtersToKill.forEach(function(f) {
+                                if (adv[f] !== undefined) adv[f] = false;
+                            });
+                        });
+                    }
+                    c.channelCount = 2;
+                    console.log(LOG, 'applyConstraints interceptado — filtros bloqueados y estéreo mantenido.');
                 }
-                c.channelCount = 2;
-                console.log(LOG, 'applyConstraints interceptado — filtros bloqueados y estéreo mantenido.');
             }
             return _ac.apply(this, arguments);
         };
@@ -441,7 +467,7 @@
     }
 
     console.log(
-        '%c' + LOG + ' v2.4.0 — Protección de Audio Inicializada (MAIN world)',
+        '%c' + LOG + ' v2.5.0 — Protección de Audio Inicializada (MAIN world)',
         'color: #00ff88; font-weight: bold; font-size: 13px;'
     );
 })();

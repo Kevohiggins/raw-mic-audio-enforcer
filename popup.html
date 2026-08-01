@@ -10,7 +10,7 @@
         <div class="brand">
             <span class="brand-title">Raw Mic Enforcer</span>
         </div>
-        <span class="version">v2.4.0</span>
+        <span class="version">v2.5.0</span>
     </header>
 
     <!-- Switch Maestro -->
@@ -46,17 +46,37 @@
         <div class="accordion-content">
             <div class="protocol-item">
                 <div>
-                    <div class="protocol-label">Filtros de Micro</div>
-                    <div class="protocol-desc">Elimina supresión, eco y ganancia</div>
+                    <div class="protocol-label">Cancelación de Eco</div>
+                    <div class="protocol-desc">Bloquea el filtro que elimina la reverberación</div>
                 </div>
                 <label class="switch">
-                    <input type="checkbox" id="protoKillFilters">
+                    <input type="checkbox" id="protoKillEcho">
                     <span class="slider"></span>
                 </label>
             </div>
             <div class="protocol-item">
                 <div>
-                    <div class="protocol-label">Intercepción SDP Opus</div>
+                    <div class="protocol-label">Supresión de Ruido</div>
+                    <div class="protocol-desc">Bloquea el filtro nativo que reduce ruido de fondo</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoKillNoise">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Control de Ganancia</div>
+                    <div class="protocol-desc">Bloquea el ajuste automático de volumen del micrófono</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="protoKillGain">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="protocol-item">
+                <div>
+                    <div class="protocol-label">Intercepcin SDP Opus</div>
                     <div class="protocol-desc">Fuerza estéreo CBR con la calidad seleccionada</div>
                 </div>
                 <label class="switch">
@@ -66,8 +86,8 @@
             </div>
             <div class="protocol-item">
                 <div>
-                    <div class="protocol-label">Anular Compresores</div>
-                    <div class="protocol-desc">DynamicsCompressor a ratio 1:1</div>
+                    <div class="protocol-label">Neutralizar Compresores</div>
+                    <div class="protocol-desc">Anula compresores dinámicos de audio (ratio 1:1)</div>
                 </div>
                 <label class="switch">
                     <input type="checkbox" id="protoCompressorKill">
@@ -76,7 +96,7 @@
             </div>
             <div class="protocol-item">
                 <div>
-                    <div class="protocol-label">Bitrate MediaRecorder</div>
+                    <div class="protocol-label">Calidad de Grabación</div>
                     <div class="protocol-desc">Aplica la calidad seleccionada a grabaciones</div>
                 </div>
                 <label class="switch">
@@ -86,7 +106,7 @@
             </div>
             <div class="protocol-item">
                 <div>
-                    <div class="protocol-label">AudioWorklet (Procesadores Custom)</div>
+                    <div class="protocol-label">Procesadores de Audio (AudioWorklet)</div>
                     <div class="protocol-desc">Detecta y monitorea módulos de audio de terceros</div>
                 </div>
                 <label class="switch">
@@ -96,7 +116,7 @@
             </div>
             <div class="protocol-item">
                 <div>
-                    <div class="protocol-label">Captura de Pantalla (getDisplayMedia)</div>
+                    <div class="protocol-label">Audio en Captura de Pantalla</div>
                     <div class="protocol-desc">Elimina filtros de audio del sistema en capturas</div>
                 </div>
                 <label class="switch">

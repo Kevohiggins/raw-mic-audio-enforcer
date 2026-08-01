@@ -3,7 +3,9 @@ const DEFAULT_CONFIG = {
     blacklist: [],
     targetBitrate: 320000,
     protocols: {
-        killFilters: true,
+        killEcho: true,
+        killNoise: true,
+        killGain: true,
         sdpMunge: true,
         compressorKill: true,
         mediaRecorder: true,
@@ -32,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Switchees de Protocolos
-    const protoKeys = ['killFilters', 'sdpMunge', 'compressorKill', 'mediaRecorder', 'audioWorklet', 'displayMedia', 'encodedTransform', 'workletFetch'];
+    const protoKeys = ['killEcho', 'killNoise', 'killGain', 'sdpMunge', 'compressorKill', 'mediaRecorder', 'audioWorklet', 'displayMedia', 'encodedTransform', 'workletFetch'];
     protoKeys.forEach(key => {
         const id = 'proto' + key.charAt(0).toUpperCase() + key.slice(1);
         const input = document.getElementById(id);
@@ -69,7 +71,9 @@ function loadOptions() {
             bitrateSelect.value = targetBitrate.toString();
         }
 
-        document.getElementById('protoKillFilters').checked = !!protocols.killFilters;
+        document.getElementById('protoKillEcho').checked = protocols.killEcho !== false;
+        document.getElementById('protoKillNoise').checked = protocols.killNoise !== false;
+        document.getElementById('protoKillGain').checked = protocols.killGain !== false;
         document.getElementById('protoSdpMunge').checked = !!protocols.sdpMunge;
         document.getElementById('protoCompressorKill').checked = !!protocols.compressorKill;
         document.getElementById('protoMediaRecorder').checked = !!protocols.mediaRecorder;
@@ -157,7 +161,9 @@ function removeDomain(domain) {
 
 function saveProtocols() {
     const protocols = {
-        killFilters: document.getElementById('protoKillFilters').checked,
+        killEcho: document.getElementById('protoKillEcho').checked,
+        killNoise: document.getElementById('protoKillNoise').checked,
+        killGain: document.getElementById('protoKillGain').checked,
         sdpMunge: document.getElementById('protoSdpMunge').checked,
         compressorKill: document.getElementById('protoCompressorKill').checked,
         mediaRecorder: document.getElementById('protoMediaRecorder').checked,
