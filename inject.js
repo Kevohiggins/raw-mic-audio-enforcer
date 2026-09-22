@@ -1,6 +1,6 @@
 (function() {
     // ============================================================
-    // RAW MIC AUDIO ENFORCER v2.5.0
+    // RAW MIC AUDIO ENFORCER v2.5.1
     // Intercepción dinámica de audio WebRTC / Web Audio.
     // ============================================================
     if (window.__rawMicEnforcerInjected) return;
@@ -122,15 +122,12 @@
 
     // ============================================================
     // 2. HELPER: SDP Munging — Forzar Opus a máxima calidad
-    //    Regex robusta: soporta "opus/48000" y "opus/48000/2"
     // ============================================================
-    function mungeSDP(sdp) {
-        if (!currentConfig.isActive || !currentConfig.protocols.sdpMunge) return sdp;
-        if (!sdp) return sdp;
-
-        // Busca el payload type de Opus, con o sin canal explícito (/2)
-        var m = sdp.match(/a=rtpmap:(\d+)\s+opus\/48000(?:\/\d+)?/i);
-        if (!m) return sdp;
+    // 2. HELPER: SDP Munging — Forzar Opus a máxima calidad en pistas locales
+    // ============================================================
+    function mungeAudioSection(section) {
+        var m = section.match(/a=rtpmap:(\d+)\s+opus\/48000(?:\/\d+)?/i);
+        if (!m) return section;
 
         var pt = m[1];
         var br = getTargetBitrate();
@@ -139,20 +136,37 @@
                  '; maxplaybackrate=48000; cbr=1';
 
         var fmtpRe = new RegExp('a=fmtp:' + pt + '\\s[^\\r\\n]*');
-
-        if (fmtpRe.test(sdp)) {
-            sdp = sdp.replace(fmtpRe, 'a=fmtp:' + pt + ' ' + hq);
+        if (fmtpRe.test(section)) {
+            section = section.replace(fmtpRe, 'a=fmtp:' + pt + ' ' + hq);
         } else {
             var mapRe = new RegExp('(a=rtpmap:' + pt + '[^\\r\\n]*\\r\\n)');
-            sdp = sdp.replace(mapRe, '$1a=fmtp:' + pt + ' ' + hq + '\r\n');
+            section = section.replace(mapRe, '$1a=fmtp:' + pt + ' ' + hq + '\r\n');
         }
 
-        // Eliminar límites de banda que Chrome/Firefox puedan imponer en el SDP
-        sdp = sdp.replace(/b=AS:\d+\r\n/g, '');
-        sdp = sdp.replace(/b=TIAS:\d+\r\n/g, '');
-        sdp = sdp.replace(/b=CT:\d+\r\n/g, '');
+        // Eliminar límites de banda restrictivos en esta sección
+        section = section.replace(/b=AS:\d+\r\n/g, '');
+        section = section.replace(/b=TIAS:\d+\r\n/g, '');
+        section = section.replace(/b=CT:\d+\r\n/g, '');
 
-        return sdp;
+        return section;
+    }
+
+    function mungeSDP(sdp) {
+        if (!currentConfig.isActive || !currentConfig.protocols.sdpMunge) return sdp;
+        if (!sdp) return sdp;
+
+        var parts = sdp.split(/(?=\r?\nm=)/);
+        for (var i = 0; i < parts.length; i++) {
+            var part = parts[i];
+            if (/^(\r?\n)?m=audio/i.test(part)) {
+                // NUNCA tocar secciones recvonly (audio que recibimos de otros usuarios)
+                if (!/a=recvonly(\r?\n|$)/i.test(part)) {
+                    parts[i] = mungeAudioSection(part);
+                }
+            }
+        }
+
+        return parts.join('');
     }
 
     // ============================================================
@@ -167,7 +181,10 @@
             }
             return _gum(c).then(function(stream) {
                 var audioTracks = stream.getAudioTracks();
-                audioTracks.forEach(function(t) { activeTracks.push(t); });
+                audioTracks.forEach(function(t) {
+                    t.__rawMicLocal = true;
+                    activeTracks.push(t);
+                });
                 cleanupTracks();
                 return stream;
             });
@@ -193,7 +210,15 @@
                     console.log(LOG, 'getDisplayMedia interceptado — filtros de audio del sistema bloqueados.');
                 }
             }
-            return _gdm(c);
+            return _gdm(c).then(function(stream) {
+                var audioTracks = stream.getAudioTracks();
+                audioTracks.forEach(function(t) {
+                    t.__rawMicLocal = true;
+                    activeTracks.push(t);
+                });
+                cleanupTracks();
+                return stream;
+            });
         };
     }
 
@@ -208,7 +233,17 @@
                 if (currentConfig.isActive) {
                     console.log(LOG, fn + ' legacy interceptado.');
                 }
-                return _orig(c, ok, err);
+                var wrappedOk = function(stream) {
+                    if (stream && stream.getAudioTracks) {
+                        stream.getAudioTracks().forEach(function(t) {
+                            t.__rawMicLocal = true;
+                            activeTracks.push(t);
+                        });
+                        cleanupTracks();
+                    }
+                    if (typeof ok === 'function') ok(stream);
+                };
+                return _orig(c, wrappedOk, err);
             };
         }
     });
@@ -228,14 +263,9 @@
             return _sld.apply(this, [desc]);
         };
 
-        var _srd = proto.setRemoteDescription;
-        proto.setRemoteDescription = function(desc) {
-            if (currentConfig.isActive && currentConfig.protocols.sdpMunge && desc && desc.sdp) {
-                desc = { type: desc.type, sdp: mungeSDP(desc.sdp) };
-                console.log(LOG, 'SDP remoto modificado.');
-            }
-            return _srd.apply(this, [desc]);
-        };
+        // NOTA: setRemoteDescription NO se intercepta deliberadamente.
+        // El SDP remoto describe los streams entrantes (lo que escuchamos de otros usuarios).
+        // Modificarlo corrompe la decodificación de audio entrante (dobla canales o genera eco en Discord/Meet).
 
         var _co = proto.createOffer;
         proto.createOffer = function() {
@@ -307,7 +337,8 @@
     if (window.MediaStreamTrack && MediaStreamTrack.prototype.applyConstraints) {
         var _ac = MediaStreamTrack.prototype.applyConstraints;
         MediaStreamTrack.prototype.applyConstraints = function(c) {
-            if (currentConfig.isActive && this.kind === 'audio' && c) {
+            var isLocal = this.__rawMicLocal || (activeTracks.indexOf(this) !== -1);
+            if (currentConfig.isActive && this.kind === 'audio' && isLocal && c) {
                 var pr = currentConfig.protocols;
                 if (pr.killEcho || pr.killNoise || pr.killGain) {
                     var filtersToKill = [];
@@ -325,7 +356,7 @@
                         });
                     }
                     c.channelCount = 2;
-                    console.log(LOG, 'applyConstraints interceptado — filtros bloqueados y estéreo mantenido.');
+                    console.log(LOG, 'applyConstraints interceptado en track local.');
                 }
             }
             return _ac.apply(this, arguments);
